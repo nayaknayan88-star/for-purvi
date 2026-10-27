@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>I Love You Purvi ❤️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #050108;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .romantic-font {
+      font-family: 'Dancing Script', cursive;
+    }
+    .neon-glow {
+      text-shadow: 0 0 10px rgba(255, 42, 133, 0.9), 0 0 25px rgba(255, 20, 147, 0.7);
+    }
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .pulse-heart {
+      animation: heartBeat 1.8s ease-in-out infinite;
+    }
+    .screen-vignette {
+      background: radial-gradient(circle at center, transparent 40%, rgba(5, 1, 8, 0.7) 85%, #050108 100%);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="relative flex items-center justify-center min-h-screen text-white">
+
+  <!-- Dual Canvas: Matrix text rain & clean bubble dot particles -->
+  <canvas id="matrixCanvas" class="z-0"></canvas>
+  <canvas id="particleCanvas" class="z-10"></canvas>
+
+  <div class="screen-vignette absolute inset-0 z-20"></div>
+
+  <!-- Interactive Controls: Music & Replay -->
+  <div class="fixed top-4 right-4 z-40 flex items-center gap-2">
+    <button id="musicToggleBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-pink-950/40 border border-pink-500/40 text-pink-300 text-xs sm:text-sm backdrop-blur-md shadow-[0_0_15px_rgba(255,42,133,0.3)] transition hover:bg-pink-900/50 hover:border-pink-300">
+      <svg id="musicIcon" class="w-4 h-4 fill-current animate-pulse" viewBox="0 0 24 24">
+        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+      </svg>
+      <span id="musicText">Sound On ♫</span>
+    </button>
+    <button id="replayBtn" class="p-2 rounded-full bg-pink-950/40 border border-pink-500/40 text-pink-300 backdrop-blur-md hover:bg-pink-900/50 hover:border-pink-300 transition" title="Replay">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Tap To Open / Start Prompt -->
+  <div id="startPrompt" class="fixed inset-0 z-30 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm cursor-pointer transition-opacity duration-700">
+    <div class="relative p-6 sm:p-8 rounded-2xl border border-pink-500/40 bg-black/60 shadow-[0_0_35px_rgba(255,42,133,0.4)] text-center max-w-xs sm:max-w-sm mx-4">
+      <div class="w-14 h-14 mx-auto mb-3 rounded-full border border-pink-400/50 flex items-center justify-center bg-pink-500/10 shadow-[0_0_20px_rgba(255,42,133,0.6)]">
+        <span class="text-2xl animate-bounce">💖</span>
+      </div>
+      <p class="text-pink-300 font-semibold tracking-wider text-base sm:text-lg mb-0.5">A Special Surprise</p>
+      <p class="text-xs text-pink-200/70 mb-4 font-mono">For Purvi</p>
+      <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-pink-600 to-rose-500 text-white font-medium text-xs sm:text-sm tracking-wide shadow-[0_0_15px_rgba(255,42,133,0.6)]">
+        <span>Tap to View</span>
+        <span>✨</span>
+      </div>
+      <p class="text-[10px] text-pink-300/40 mt-3 font-mono">Turn on volume for background melody 🎧</p>
+    </div>
+  </div>
+
+  <!-- End Overlays: Purvi Center Heart Text & Final Apology Card -->
+  <div id="finalCard" class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none opacity-0 transition-opacity duration-1000 px-4">
+    <div class="relative flex flex-col items-center max-w-md w-full text-center">
+      
+      <!-- Center text inside the beating particle heart -->
+      <div class="mb-3 mt-1 pointer-events-auto">
+        <h1 class="romantic-font text-3xl sm:text-5xl md:text-6xl text-white font-bold tracking-wide drop-shadow-[0_0_22px_rgba(255,105,180,1)] pulse-heart">
+          I Love You <span class="text-pink-400">Purvi baby</span>
+        </h1>
+        <div class="flex items-center justify-center gap-2 text-pink-300 text-xs sm:text-sm mt-1 opacity-90">
+          <span>✨</span>
+          <span class="tracking-widest font-light uppercase text-[11px] text-pink-200/80">Forever & Always</span>
+          <span>✨</span>
+        </div>
+      </div>
+
+      <!-- Floating Apology: No surrounding box or card, just clean glowing text and emojis -->
+      <div id="sorryBox" class="mt-4 sm:mt-6 transform transition-all duration-700 translate-y-4 opacity-0 pointer-events-auto flex items-center justify-center gap-2 sm:gap-3 drop-shadow-[0_0_25px_rgba(255,20,147,0.8)]">
+        <span class="text-2xl sm:text-3xl filter drop-shadow-[0_0_8px_rgba(255,105,180,0.6)]">🥺</span>
+        <span class="romantic-font text-3xl sm:text-4xl text-pink-300 font-bold neon-glow leading-none">
+          Sorry
+        </span>
+        <span class="text-2xl sm:text-3xl filter drop-shadow-[0_0_8px_rgba(255,105,180,0.6)]">🥺</span>
+        <span class="text-2xl sm:text-3xl filter drop-shadow-[0_0_8px_rgba(255,105,180,0.6)]">❤️</span>
+        <span class="text-2xl sm:text-3xl filter drop-shadow-[0_0_8px_rgba(255,105,180,0.6)]">👉👈</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================================
+       1. MATRIX FALLING CODE BACKGROUND (PINK / MAGENTA PALETTE)
+       ===================================================================== */
+    const matrixCanvas = document.getElementById('matrixCanvas');
+    const mCtx = matrixCanvas.getContext('2d');
+
+    const particleCanvas = document.getElementById('particleCanvas');
+    const pCtx = particleCanvas.getContext('2d');
+
+    let width = (matrixCanvas.width = particleCanvas.width = window.innerWidth);
+    let height = (matrixCanvas.height = particleCanvas.height = window.innerHeight);
+
+    // Matrix characters: Strictly cycling 'I LOVE YOU ' in tiny delicate pink code
+    const rainPhrase = 'I LOVE YOU ♡ ';
+    const fontSize = 7.5;
+    // Step reduced by another 50% down to 1.3px -> +100% more simultaneous vertical lines
+    const colStep = 1.3;
+    let columns = Math.floor(width / colStep);
+    let drops = [];
+    let secondaryDrops = [];
+    let tertiaryDrops = [];
+    let quaternaryDrops = [];
+    let charOffsets = [];
+    let speeds = [];
+
+    function initMatrix() {
+      columns = Math.floor(width / colStep);
+      drops = [];
+      secondaryDrops = [];
+      tertiaryDrops = [];
+      quaternaryDrops = [];
+      charOffsets = [];
+      speeds = [];
+      for (let i = 0; i < columns; i++) {
+        // Wave 1: First diagonal sweep (0 to 32 rows offset)
+        const diagonalDelay1 = (i / columns) * 32; 
+        drops[i] = -diagonalDelay1 - (Math.random() * 4);
+        
+        // Wave 2: Second diagonal sweep following wave 1
+        const diagonalDelay2 = diagonalDelay1 + 38;
+        secondaryDrops[i] = -diagonalDelay2 - (Math.random() * 6);
+
+        // Wave 3: Third diagonal sweep following wave 2
+        const diagonalDelay3 = diagonalDelay2 + 38;
+        tertiaryDrops[i] = -diagonalDelay3 - (Math.random() * 6);
+
+        // Continuous filler curtain to ensure massive +100% density throughout
+        quaternaryDrops[i] = -diagonalDelay1 - 12 - (Math.random() * 10);
+        
+        charOffsets[i] = Math.floor(Math.random() * rainPhrase.length);
+        speeds[i] = 0.95 + (Math.random() * 0.45);
+      }
+    }
+    initMatrix();
+
+    function renderColumnChar(dropY, colIndex) {
+      if (dropY < 0) return;
+      const textY = dropY * fontSize;
+      if (textY > height + 20) return;
+
+      const charIdx = (charOffsets[colIndex] + Math.floor(dropY)) % rainPhrase.length;
+      const text = rainPhrase[charIdx];
+      const x = colIndex * colStep;
+
+      if (text && text !== ' ') {
+        // Sparkling leading characters vs soft magenta trails
+        const isHead = Math.random() > 0.86;
+        if (isHead) {
+          mCtx.fillStyle = '#ffffff';
+          mCtx.shadowColor = '#ff3399';
+          mCtx.shadowBlur = 6;
+        } else {
+          mCtx.fillStyle = '#ff2a85';
+          mCtx.shadowColor = '#d81b60';
+          mCtx.shadowBlur = 1.5;
+        }
+        mCtx.fillText(text, x, textY);
+        mCtx.shadowBlur = 0;
+      }
+    }
+
+    function drawMatrix() {
+      // Gentle dark trail fade
+      mCtx.fillStyle = 'rgba(4, 1, 6, 0.16)';
+      mCtx.fillRect(0, 0, width, height);
+
+      mCtx.font = `600 ${fontSize}px 'JetBrains Mono', monospace`;
+
+      for (let i = 0; i < columns; i++) {
+        const speed = speeds[i] || 1.0;
+
+        // Primary falling drop stream
+        if (drops[i] < 0) {
+          drops[i] += 0.85;
+        } else {
+          renderColumnChar(drops[i], i);
+          const y = drops[i] * fontSize;
+          if (y > height && Math.random() > 0.975) {
+            drops[i] = 0;
+            charOffsets[i] = (charOffsets[i] + 3) % rainPhrase.length;
+          }
+          drops[i] += speed;
+        }
+
+        // Secondary stream
+        if (secondaryDrops[i] < 0) {
+          secondaryDrops[i] += 0.85;
+        } else {
+          renderColumnChar(secondaryDrops[i], i);
+          const secY = secondaryDrops[i] * fontSize;
+          if (secY > height && Math.random() > 0.98) {
+            secondaryDrops[i] = -(Math.random() * 8);
+            charOffsets[i] = (charOffsets[i] + 5) % rainPhrase.length;
+          }
+          secondaryDrops[i] += speed * 1.05;
+        }
+
+        // Tertiary stream (+50% denser continuous rain coverage)
+        if (tertiaryDrops[i] < 0) {
+          tertiaryDrops[i] += 0.85;
+        } else {
+          renderColumnChar(tertiaryDrops[i], i);
+          const terY = tertiaryDrops[i] * fontSize;
+          if (terY > height && Math.random() > 0.982) {
+            tertiaryDrops[i] = -(Math.random() * 12);
+            charOffsets[i] = (charOffsets[i] + 7) % rainPhrase.length;
+          }
+          tertiaryDrops[i] += speed * 0.95;
+        }
+
+        // Quaternary opening wave stream (provides ultra-dense opening curtain effect)
+        if (quaternaryDrops[i] < 0) {
+          quaternaryDrops[i] += 0.85;
+        } else {
+          renderColumnChar(quaternaryDrops[i], i);
+          const quatY = quaternaryDrops[i] * fontSize;
+          if (quatY > height && Math.random() > 0.985) {
+            quaternaryDrops[i] = -(Math.random() * 16);
+            charOffsets[i] = (charOffsets[i] + 9) % rainPhrase.length;
+          }
+          quaternaryDrops[i] += speed * 1.1;
+        }
+      }
+    }
+
+    /* =====================================================================
+       2. PARTICLE SYSTEM & LED BUBBLE DOT-MATRIX MORPH ENGINE
+       ===================================================================== */
+    const sampleCanvas = document.createElement('canvas');
+    const sCtx = sampleCanvas.getContext('2d');
+
+    class Particle {
+      constructor(x, y) {
+        this.x = x !== undefined ? x : Math.random() * width;
+        this.y = y !== undefined ? y : Math.random() * height;
+        this.targetX = this.x;
+        this.targetY = this.y;
+        this.vx = (Math.random() - 0.5) * 5;
+        this.vy = (Math.random() - 0.5) * 5;
+        // Clean, uniform circular LED beads
+        this.radius = 1.9;
+        this.baseRadius = 1.9;
+        this.color = Math.random() > 0.35 ? '#ffffff' : '#ffd5ea';
+        this.friction = 0.84;
+        this.ease = 0.09 + Math.random() * 0.03;
+        this.alpha = 0.95;
+      }
+
+      setTarget(x, y) {
+        this.targetX = x;
+        this.targetY = y;
+      }
+
+      update() {
+        const dx = this.targetX - this.x;
+        const dy = this.targetY - this.y;
+
+        this.vx += dx * this.ease;
+        this.vy += dy * this.ease;
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+
+        this.x += this.vx;
+        this.y += this.vy;
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        // Crisp neon pink glow rim around discrete circular dot
+        ctx.shadowColor = '#ff1493';
+        ctx.shadowBlur = 7;
+        ctx.globalAlpha = this.alpha;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    let particles = [];
+    // Increased particle capacity for tighter, denser letter coverage
+    const MAX_PARTICLES = 3600;
+
+    // Grid-spaced dot matrix sampler: produces crisp, non-overlapping circular beads
+    function getPointsFromText(text, fontSizeVal = null) {
+      sampleCanvas.width = width;
+      sampleCanvas.height = height;
+      sCtx.clearRect(0, 0, width, height);
+
+      const responsiveSize = fontSizeVal || Math.min(width * 0.36, height * 0.35, 250);
+      sCtx.fillStyle = '#ffffff';
+      sCtx.textAlign = 'center';
+      sCtx.textBaseline = 'middle';
+      sCtx.font = `900 ${responsiveSize}px 'Montserrat', sans-serif`;
+      sCtx.fillText(text, width / 2, height / 2 - 20);
+
+      const imgData = sCtx.getImageData(0, 0, width, height).data;
+      const points = [];
+      // Reduced grid step by ~40% for tighter spacing between bubbles
+      const gridStep = Math.max(3.8, Math.floor(Math.min(width, height) * 0.0075));
+
+      for (let y = 0; y < height; y += gridStep) {
+        for (let x = 0; x < width; x += gridStep) {
+          const index = (y * width + x) * 4;
+          if (imgData[index + 3] > 140) {
+            points.push({ x, y });
+          }
+        }
+      }
+      return points;
+    }
+
+    // Mathematical Parametric Heart with dense non-overlapping outline & internal volume
+    function getPointsForHeart() {
+      const points = [];
+      const totalPoints = 2600;
+      const scale = Math.min(width, height) * 0.023;
+      const centerX = width / 2;
+      const centerY = height / 2 - 25;
+
+      for (let i = 0; i < totalPoints; i++) {
+        const t = Math.PI * 2 * (i / totalPoints);
+        // Tighter concentric layers with reduced gap between concentric heart shells
+        const layer = (i % 8) / 8;
+        const r = 0.84 + layer * 0.28;
+        const x = 16 * Math.pow(Math.sin(t), 3) * scale * r;
+        const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) * scale * r;
+
+        points.push({
+          x: centerX + x,
+          y: centerY + y
+        });
+      }
+      return points;
+    }
+
+    // Smoothly morph active particles into the new coordinate set
+    function morphTo(newPoints) {
+      while (particles.length < newPoints.length && particles.length < MAX_PARTICLES) {
+        const pt = newPoints[particles.length] || { x: width / 2, y: height / 2 };
+        particles.push(new Particle(pt.x, pt.y));
+      }
+
+      const shuffled = [...newPoints].sort(() => Math.random() - 0.5);
+
+      particles.forEach((p, index) => {
+        if (index < shuffled.length) {
+          p.setTarget(shuffled[index].x, shuffled[index].y);
+          p.alpha = 0.95;
+          p.radius = p.baseRadius;
+        } else {
+          // Extra particles drift softly into the background
+          p.setTarget(width / 2 + (Math.random() - 0.5) * 400, height / 2 + (Math.random() - 0.5) * 400);
+          p.alpha = 0.12;
+          p.radius = 1.0;
+        }
+      });
+    }
+
+    function burstParticles() {
+      particles.forEach(p => {
+        p.vx = (Math.random() - 0.5) * 18;
+        p.vy = (Math.random() - 0.5) * 18;
+      });
+    }
+
+    /* =========================================================================
+       3. AMBIENT ROMANTIC SYNTHESIZER (ZERO EXTERNAL AUDIO DEPENDENCY)
+       ========================================================================= */
+    let audioCtx = null;
+    let isMusicPlaying = false;
+    let musicTimer = null;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    const noteFreqs = {
+      'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'G4': 392.00, 'A4': 440.00,
+      'C5': 523.25, 'D5': 587.33, 'E5': 659.25, 'G5': 783.99, 'A5': 880.00
+    };
+    const romanticMelody = ['C4', 'E4', 'G4', 'C5', 'A4', 'G4', 'E4', 'D4', 'E4', 'G4', 'A4', 'C5', 'D5', 'C5', 'G4', 'E4'];
+
+    function playSynthTone(freq, duration = 1.3, type = 'sine') {
+      if (!audioCtx || audioCtx.state !== 'running') return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (err) {}
+    }
+
+    let noteIdx = 0;
+    function startMusic() {
+      initAudioContext();
+      isMusicPlaying = true;
+      document.getElementById('musicText').textContent = 'Sound On ♫';
+      document.getElementById('musicIcon').classList.add('animate-pulse');
+
+      if (musicTimer) clearInterval(musicTimer);
+      musicTimer = setInterval(() => {
+        if (!isMusicPlaying) return;
+        const note = romanticMelody[noteIdx % romanticMelody.length];
+        playSynthTone(noteFreqs[note], 1.5, 'sine');
+        if (noteIdx % 4 === 0) {
+          playSynthTone(noteFreqs['C4'] / 2, 2.2, 'triangle');
+        }
+        noteIdx++;
+      }, 480);
+    }
+
+    function stopMusic() {
+      isMusicPlaying = false;
+      document.getElementById('musicText').textContent = 'Muted ✕';
+      document.getElementById('musicIcon').classList.remove('animate-pulse');
+      if (musicTimer) {
+        clearInterval(musicTimer);
+        musicTimer = null;
+      }
+    }
+
+    function toggleMusic() {
+      if (isMusicPlaying) stopMusic();
+      else startMusic();
+    }
+
+    function chime() {
+      if (!audioCtx || audioCtx.state !== 'running') return;
+      [523.25, 659.25, 783.99].forEach((f, idx) => {
+        setTimeout(() => playSynthTone(f, 0.8, 'sine'), idx * 75);
+      });
+    }
+
+    /* =========================================================================
+       4. SEQUENCE TIMELINE
+       Left-to-Right Drop Wave -> 3 -> 2 -> 1 -> You -> Are -> My -> Love -> Heart + Purvi -> Sorry
+       ========================================================================= */
+    let sequenceTimeouts = [];
+    let isHeartActive = false;
+    let heartPoints = [];
+
+    function stopSequence() {
+      sequenceTimeouts.forEach(t => clearTimeout(t));
+      sequenceTimeouts = [];
+      isHeartActive = false;
+      document.getElementById('finalCard').style.opacity = '0';
+      const sorryBox = document.getElementById('sorryBox');
+      sorryBox.classList.remove('opacity-100', 'translate-y-0');
+      sorryBox.classList.add('opacity-0', 'translate-y-4');
+    }
+
+    function step(ms, fn) {
+      const id = setTimeout(fn, ms);
+      sequenceTimeouts.push(id);
+    }
+
+    function runSequence() {
+      stopSequence();
+      initMatrix();
+
+      // Phase 1: 3 complete opening left-to-right cascade waves play out (~0s - 7.5s)
+      particles.forEach(p => { p.alpha = 0; });
+
+      // Phase 2: Countdown 3 -> 2 -> 1
+      step(7500, () => {
+        chime();
+        morphTo(getPointsFromText('3'));
+      });
+
+      step(9800, burstParticles);
+
+      step(10100, () => {
+        chime();
+        morphTo(getPointsFromText('2'));
+      });
+
+      step(12400, burstParticles);
+
+      step(12700, () => {
+        chime();
+        morphTo(getPointsFromText('1'));
+      });
+
+      step(15000, burstParticles);
+
+      // Phase 3: "You" -> "Are" -> "My" -> "Love"
+      step(15300, () => {
+        chime();
+        morphTo(getPointsFromText('You'));
+      });
+
+      step(17700, burstParticles);
+
+      step(18000, () => {
+        chime();
+        morphTo(getPointsFromText('Are'));
+      });
+
+      step(20400, burstParticles);
+
+      step(20700, () => {
+        chime();
+        morphTo(getPointsFromText('My'));
+      });
+
+      step(23100, burstParticles);
+
+      step(23400, () => {
+        chime();
+        morphTo(getPointsFromText('Love'));
+      });
+
+      step(26000, burstParticles);
+
+      // Phase 4: Big Glowing Particle Heart
+      step(26400, () => {
+        chime();
+        heartPoints = getPointsForHeart();
+        morphTo(heartPoints);
+        isHeartActive = true;
+      });
+
+      // Reveal "I Love You Purvi"
+      step(27800, () => {
+        document.getElementById('finalCard').style.opacity = '1';
+        burstEmojiHearts(14);
+      });
+
+      // Phase 5: Clean Apology Box ("Sorry 🥺 ❤️ 👉👈")
+      step(30500, () => {
+        const sorryBox = document.getElementById('sorryBox');
+        sorryBox.classList.remove('opacity-0', 'translate-y-4');
+        sorryBox.classList.add('opacity-100', 'translate-y-0');
+        burstEmojiHearts(10);
+      });
+    }
+
+    function burstEmojiHearts(count = 8) {
+      const emojis = ['💖', '💕', '🥺', '✨', '💗', '❤️', '🌸'];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'fixed pointer-events-none z-30 transition-all select-none';
+        el.style.left = `${Math.random() * 80 + 10}%`;
+        el.style.top = `${Math.random() * 30 + 55}%`;
+        el.style.fontSize = `${Math.random() * 18 + 16}px`;
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.transform = `scale(0.3) translateY(0)`;
+        el.style.opacity = '0';
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+          el.style.transition = 'all 2.2s cubic-bezier(0.1, 0.8, 0.3, 1)';
+          el.style.transform = `scale(1.15) translateY(-${Math.random() * 150 + 80}px)`;
+          el.style.opacity = '0.9';
+        }, 30);
+
+        setTimeout(() => {
+          el.style.opacity = '0';
+          setTimeout(() => el.remove(), 600);
+        }, 2100);
+      }
+    }
+
+    /* Tap/Touch effect */
+    window.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('#musicToggleBtn') || e.target.closest('#replayBtn') || e.target.closest('#startPrompt')) return;
+
+      const clickX = e.clientX;
+      const clickY = e.clientY;
+
+      particles.forEach(p => {
+        const dx = p.x - clickX;
+        const dy = p.y - clickY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+          const force = (150 - dist) * 0.12;
+          p.vx += (dx / dist) * force;
+          p.vy += (dy / dist) * force;
+        }
+      });
+
+      const pop = document.createElement('span');
+      pop.className = 'fixed pointer-events-none z-30 text-xl';
+      pop.textContent = ['💖', '✨', '🥺', '💕'][Math.floor(Math.random() * 4)];
+      pop.style.left = `${clickX - 10}px`;
+      pop.style.top = `${clickY - 10}px`;
+      pop.style.transition = 'all 0.9s ease-out';
+      document.body.appendChild(pop);
+
+      setTimeout(() => {
+        pop.style.transform = `translateY(-50px) scale(1.3)`;
+        pop.style.opacity = '0';
+        setTimeout(() => pop.remove(), 900);
+      }, 20);
+
+      if (audioCtx && isMusicPlaying) {
+        playSynthTone(880, 0.3, 'sine');
+      }
+    });
+
+    /* =========================================================================
+       5. MAIN ENGINE LOOP & CLEAN HEART PULSING
+       ========================================================================= */
+    let heartTimer = 0;
+
+    function loop() {
+      drawMatrix();
+      pCtx.clearRect(0, 0, width, height);
+
+      // Clean, subtle pulse for the dot heart
+      if (isHeartActive && heartPoints.length > 0) {
+        heartTimer += 0.05;
+        const pulse = 1 + Math.sin(heartTimer * 2.2) * 0.04;
+        const centerX = width / 2;
+        const centerY = height / 2 - 25;
+
+        particles.forEach((p, idx) => {
+          if (idx < heartPoints.length) {
+            const base = heartPoints[idx];
+            p.setTarget(centerX + (base.x - centerX) * pulse, centerY + (base.y - centerY) * pulse);
+          }
+        });
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw(pCtx);
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    /* Window resize */
+    window.addEventListener('resize', () => {
+      width = matrixCanvas.width = particleCanvas.width = window.innerWidth;
+      height = matrixCanvas.height = particleCanvas.height = window.innerHeight;
+      initMatrix();
+      if (isHeartActive) {
+        heartPoints = getPointsForHeart();
+        morphTo(heartPoints);
+      }
+    });
+
+    /* Initial trigger */
+    const startPrompt = document.getElementById('startPrompt');
+    startPrompt.addEventListener('click', () => {
+      startPrompt.style.opacity = '0';
+      setTimeout(() => startPrompt.style.display = 'none', 700);
+      startMusic();
+      runSequence();
+    });
+
+    document.getElementById('musicToggleBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMusic();
+    });
+
+    document.getElementById('replayBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      runSequence();
+    });
+
+    window.onload = function () {
+      loop();
+    };
+  </script>
+</body>
+</html>
